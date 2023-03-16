@@ -1,6 +1,4 @@
-# Wallet Nestjs
-
-------------------------
+# 💲Wallet Nestjs
 
 **Projeto desenvolvido com os seguintes padrões:**
 
@@ -8,7 +6,7 @@
 - S.O.L.I.D
 - Clean Architecture
 
-Breve conceito S.O.L.I.D:
+**Breve conceito S.O.L.I.D:**
 
 ```
 S — Single Responsiblity Principle (Princípio da responsabilidade única)
@@ -20,13 +18,11 @@ D — Dependency Inversion Principle (Princípio da inversão da dependência)
 
 - <a href="https://www.techtarget.com/whatis/definition/clean-architecture" target="_blank">Mais Sobre Clean Architecture</a>
 
-------------------
 
 ## 🚀📜 - SWAGGER
 
 **Antes de mais nada, além de toda essa documentação e utilitários que está na raiz do projeto, temos o Swagger para facilitar ainda mais o uso da API, acesse -> {URL}/docs**
 
-------------------
 
 ## 🚀▶ - Execute o projeto rodando:
 
@@ -54,7 +50,6 @@ $ yarn run start:prod
 
 **✅🐳 - Com docker**
 
---------
 
 ## Testes
 
@@ -69,16 +64,16 @@ $ yarn run test:e2e
 $ yarn run test:cov
 ```
 
-----------------------
 
 ## Próximos passos de upgrade
 
 ### Etapa 1
 
 - O microservice responsável por buscar de dados, terá os dados do cache, assim em altas requisições não afetará o banco de dados (DB ReadOnly, Redis)
-- Banco não relacional para logs 
+- Banco não relacional para logs (alternativa)
 - Adicionar microservice de notificações (notificar o usuário dos status dos eventos)
-- API enviará a solicitação para uma fila e terá ali 1 ou mais workers para despache da solicitação ao 
+- Tabela para tipagem dos enums (hoje está dentro da aplicação o significado os IDs)
+- Fluxo de log para os microservices que recebem solicitações (hoje não salva em nenhum lugar essas informações)
 
 ### Etapa 2
 
@@ -86,7 +81,6 @@ $ yarn run test:cov
 - Kubernates para gestão dos containers
 - Kafka em um plano de redundância ao Redis
 
-----------------
 
 ## Enums
 
@@ -104,8 +98,6 @@ $ yarn run test:cov
 4. reversal
 5. failed
 
-
-----------------
 
 ## Demais informações
 

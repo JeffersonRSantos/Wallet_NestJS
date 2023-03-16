@@ -1,0 +1,57 @@
+version: '3.7'
+
+services:
+  mysql:
+    container_name: mysql_container
+    image: mysql:5.7.41-debian
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=wallet_nestjs
+      - MYSQL_ROOT_USER=root
+      - TZ=America/Sao_Paulo
+    expose:
+      - 3306
+    ports:
+      - '3306:3306'
+
+  wallet:
+    depends_on:
+      - mysql
+    restart: always
+    container_name: 'wallet_app_container'
+    build: .
+    command: yarn start
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=wallet_nestjs
+      - DB_USER=root
+      - DB_PASS=123456
+      - DB_PORT=3306
+    ports:
+      - 4000:4000
+    volumes:
+      - ./wallet:/usr/app
+    links:
+      - mysql:mysql
+
+  shopping:
+    depends_on:
+      - mysql
+    restart: always
+    container_name: 'shopping_app_container'
+    build: .
+    command: yarn start
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=wallet_nestjs
+      - DB_USER=root
+      - DB_PASS=123456
+      - DB_PORT=3306
+    ports:
+      - 4001:4001
+    volumes:
+      - ./shopping:/usr/app
+    links:
+      - mysql:mysql
