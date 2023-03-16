@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { JwtStrategy } from './application/useCases/AuthLogin/strategy/jwt.strategy';
 import { AppController } from './http/controllers/app.controller';
-import { WalletController } from './http/controllers/wallet.controller';
+import * as process from 'process'
 
 @Module({
   imports: [],
   controllers: [
-    AppController,
-    WalletController
+    AppController
   ],
   providers: [JwtStrategy],
 })

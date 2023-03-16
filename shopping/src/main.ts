@@ -1,15 +1,15 @@
-import { ValidationPipe } from '@nestjs/common/pipes';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger/dist';
 import { AppModule } from './app.module';
+import * as process from 'process'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
     .setTitle('Wallet NestJS')
-    .setDescription('Essa documentação te ajudará a fazer integrações com aplicações diversas. A API te oferece o melhor da Carteira Digital.')
+    .setDescription('Microservice Shopping')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -25,6 +25,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(4000);
+  await app.listen(process.env.APP_PORT || 4001);
 }
 bootstrap();
