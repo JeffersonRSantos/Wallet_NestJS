@@ -6,8 +6,7 @@ COPY . .
 
 RUN yarn
 RUN yarn build
-RUN yarn start:prod
 
-CMD [ "node", "dist/src/server.js" ]
+CMD [ "node", "wallet/dist/src/server.js" ]
 
 EXPOSE 3333

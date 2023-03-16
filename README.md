@@ -1,5 +1,16 @@
 # 💲Wallet Nestjs
 
+## Descrição do projeto
+
+<p>Estrutura baseada em microservices, existem 2 serviços, cada um com sua responsabilidade. O serviço principal é <strong>Wallet</strong>, além de ter algumas responsabilidades ele também é responsável por fazer a <strong>interface</strong> e solicitar aos demais serviços seus processamentos de dados.</p>
+
+### Infra dos serviços:
+
+- Wallet (roda na porta 4000)
+- Shopping (roda na porta 4001)
+
+------
+
 **Projeto desenvolvido com os seguintes padrões:**
 
 - POO (Programação Orientada a Objetos)
@@ -70,6 +81,7 @@ $ yarn run test:cov
 ### Etapa 1
 
 - O microservice responsável por buscar de dados, terá os dados do cache, assim em altas requisições não afetará o banco de dados (DB ReadOnly, Redis)
+- WalletInterface seria a segregação do serviço *Wallet*, seria responsável apenas por receber as requisições e chamar os microservices necessários
 - Banco não relacional para logs (alternativa)
 - Adicionar microservice de notificações (notificar o usuário dos status dos eventos)
 - Tabela para tipagem dos enums (hoje está dentro da aplicação o significado os IDs)

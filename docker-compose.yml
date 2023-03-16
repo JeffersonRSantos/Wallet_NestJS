@@ -21,7 +21,7 @@ services:
       - mysql
     restart: always
     container_name: 'wallet_app_container'
-    build: .
+    build: ./wallet
     command: yarn start
     environment:
       - DB_HOST=mysql
@@ -41,7 +41,7 @@ services:
       - mysql
     restart: always
     container_name: 'shopping_app_container'
-    build: .
+    build: ./shopping
     command: yarn start
     environment:
       - DB_HOST=mysql
