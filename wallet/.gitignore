@@ -38,4 +38,4 @@ lerna-debug.log*
 /prisma/migrations
 
 # ENV
-.env-example
+.env

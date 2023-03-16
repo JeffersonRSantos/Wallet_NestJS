@@ -4,7 +4,7 @@
 
 <p>Estrutura baseada em microservices, existem 2 serviços, cada um com sua responsabilidade. O serviço principal é <strong>Wallet</strong>, além de ter algumas responsabilidades ele também é responsável por fazer a <strong>interface</strong> e solicitar aos demais serviços seus processamentos de dados.</p>
 
-### Infra dos serviços:
+**Infra dos serviços:**
 
 - Wallet (roda na porta 4000)
 - Shopping (roda na porta 4001)
@@ -62,7 +62,7 @@ $ yarn run start:prod
 **✅🐳 - Com docker**
 
 
-## Testes
+## Testes (End-to-End)
 
 ```bash
 # unit tests

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res} from '@nestjs/common';
+import { Body, Controller, Post, Res, Get} from '@nestjs/common';
 import { Response } from 'express';
 import { authLoginUseCase } from 'src/application/useCases/AuthLogin';
 import { registerUserUseCase } from 'src/application/useCases/RegisterUser';
@@ -11,6 +11,11 @@ import { registerUserSchema } from '../schemas/RegisterUserSchema';
 export class AppController {
   public registerUser = registerUserUseCase
   public authLogin = authLoginUseCase
+
+  @Get()
+  async index(): Promise<Object>{
+    return {message: 'Welcome to Wallet NestJS'}
+  }
 
   @Post('_login')
   async login(@Body() body: AuthLoginDTO, @Res() resp: Response): Promise<Object>{
