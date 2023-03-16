@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model tb_user {
+  id          Int              @id @default(autoincrement())
+  email       String           @unique
+  cnpj        String?          @unique
+  cpf         String?          @unique
+  name        String
+  password    String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  Wallet      tb_wallet[]      @relation("userId")
+  Transaction tb_transaction[] @relation("userId")
+}
+
+model tb_wallet {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @unique
+  user               tb_user  @relation(fields: [userId], references: [id], name: "userId")
+  balance            Decimal  @db.Decimal(10, 2)
+  active_credit_card Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model tb_transaction {
+  id                Int      @id @default(autoincrement())
+  transactionId     String
+  value             Decimal  @db.Decimal(10, 2)
+  user              tb_user  @relation(fields: [userId], references: [id], name: "userId")
+  userId            Int
+  typeTransaction   Int
+  statusTransaction Int      @default(1)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
