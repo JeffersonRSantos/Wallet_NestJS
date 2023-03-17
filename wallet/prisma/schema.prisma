@@ -10,37 +10,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model tb_user {
-  id          Int              @id @default(autoincrement())
-  email       String           @unique
-  cnpj        String?          @unique
-  cpf         String?          @unique
+model User {
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  cnpj        String?       @unique
+  cpf         String?       @unique
   name        String
   password    String
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  Wallet      tb_wallet[]      @relation("userId")
-  Transaction tb_transaction[] @relation("userId")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Wallet      Wallet[]      @relation("userId")
+  Transaction Transaction[] @relation("userId")
+
+  @@map("tb_user")
 }
 
-model tb_wallet {
+model Wallet {
   id                 Int      @id @default(autoincrement())
   userId             Int      @unique
-  user               tb_user  @relation(fields: [userId], references: [id], name: "userId")
+  user               User     @relation(fields: [userId], references: [id], name: "userId")
   balance            Decimal  @db.Decimal(10, 2)
   active_credit_card Boolean  @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  @@map("tb_wallet")
 }
 
-model tb_transaction {
-  id                Int      @id @default(autoincrement())
+model Products {
+  id          Int           @id @default(autoincrement())
+  code        String        @default(cuid())
+  name        String
+  description String?
+  stock       Int           @default(0)
+  price       Decimal       @db.Decimal(10, 2)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Transaction Transaction[] @relation("productId")
+
+  @@map("tb_products")
+}
+
+model Transaction {
+  id                Int       @id @default(autoincrement())
   transactionId     String
-  value             Decimal  @db.Decimal(10, 2)
-  user              tb_user  @relation(fields: [userId], references: [id], name: "userId")
+  value             Decimal   @db.Decimal(10, 2)
+  user              User      @relation(fields: [userId], references: [id], name: "userId")
   userId            Int
   typeTransaction   Int
-  statusTransaction Int      @default(1)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  productId         Int?
+  product           Products? @relation(fields: [productId], references: [id], name: "productId")
+  statusTransaction Int       @default(1)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("tb_transaction")
 }

@@ -43,7 +43,7 @@ D — Dependency Inversion Principle (Princípio da inversão da dependência)
 # install dependences
 $ yarn install
 
-# run migrations
+# run migrations and seeds
 $ npx prisma migrate dev
 ```
 - Execute
@@ -60,6 +60,14 @@ $ yarn run start:prod
 ```
 
 **✅🐳 - Com docker**
+
+```bash
+# Compile images
+$ docker-compose up -d
+
+# Run migrates and seeds
+$ docker exec -it wallet_app_container /bin/sh -c "npx prisma migrate dev; npx prisma db seed"
+```
 
 
 ## Testes (End-to-End)
@@ -86,6 +94,7 @@ $ yarn run test:cov
 - Adicionar microservice de notificações (notificar o usuário dos status dos eventos)
 - Tabela para tipagem dos enums (hoje está dentro da aplicação o significado os IDs)
 - Fluxo de log para os microservices que recebem solicitações (hoje não salva em nenhum lugar essas informações)
+- Microservice para fluxo de emissão de notas, após o cliente adquirir uma compra
 
 ### Etapa 2
 

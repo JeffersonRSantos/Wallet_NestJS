@@ -13,7 +13,7 @@ export class AuthLoginProvider implements IAuthLogin {
 
     async login(props: any): Promise<any> {
         try {
-            const user: AuthLoginEntities = await this.connectionProvider.tb_user.findUnique({
+            const user: AuthLoginEntities = await this.connectionProvider.user.findUnique({
                 where: {
                     email: props.email,
                 },

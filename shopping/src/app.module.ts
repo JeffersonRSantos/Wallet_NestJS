@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { JwtStrategy } from './application/useCases/AuthLogin/strategy/jwt.strategy';
 import { AppController } from './http/controllers/app.controller';
-import * as process from 'process'
+import { ShoppingController } from './http/controllers/shopping.controller';
 
 @Module({
   imports: [],
   controllers: [
-    AppController
+    AppController,
+    ShoppingController
   ],
   providers: [JwtStrategy],
 })

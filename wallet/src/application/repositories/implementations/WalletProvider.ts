@@ -27,16 +27,16 @@ export class WalletProvider implements IWallet {
         try {
 
             this.dataCreateTransaction = { data: transaction }
-            await this.connectionProvider.tb_transaction.create(this.dataCreateTransaction)
+            await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
-            const getWallet: WalletEntities = await this.connectionProvider.tb_wallet.findUnique({
+            const getWallet: WalletEntities = await this.connectionProvider.wallet.findUnique({
                 where: {
                     userId: props.user.id
                 }
             })
 
             if (!getWallet) {
-                const create: WalletEntities = await this.connectionProvider.tb_wallet.create({
+                const create: WalletEntities = await this.connectionProvider.wallet.create({
                     data: {
                         userId: props.user.id,
                         balance: props.value
@@ -47,7 +47,7 @@ export class WalletProvider implements IWallet {
 
             } else {
                 const updateValue = (parseFloat(getWallet.balance) + parseFloat(props.value))
-                const updateBalance = await this.connectionProvider.tb_wallet.update({
+                const updateBalance = await this.connectionProvider.wallet.update({
                     where: { userId: props.user.id },
                     data: {
                         balance: updateValue
@@ -60,14 +60,14 @@ export class WalletProvider implements IWallet {
             transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
 
             this.dataCreateTransaction = { data: transaction }
-            await this.connectionProvider.tb_transaction.create(this.dataCreateTransaction)
+            await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
             return { message: "Deposit made successfully." }
         } catch (error) {
 
             transaction.statusTransaction = statusTransactionConstantEnum.FAILED
             this.dataCreateTransaction = { data: transaction }
-            await this.connectionProvider.tb_transaction.create(this.dataCreateTransaction)
+            await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
             return { status: 500, error }
         }
@@ -86,7 +86,7 @@ export class WalletProvider implements IWallet {
 
         try {
 
-            const getWallet: WalletEntities = await this.connectionProvider.tb_wallet.findUnique({
+            const getWallet: WalletEntities = await this.connectionProvider.wallet.findUnique({
                 where: {
                     userId: props.user.id
                 }
@@ -100,7 +100,7 @@ export class WalletProvider implements IWallet {
             if (value > balance) return { status: 401, message: 'Amount greater than the balance.' }
 
             const updateValue = (parseFloat(getWallet.balance) - parseFloat(props.value))
-            const updateBalance = await this.connectionProvider.tb_wallet.update({
+            const updateBalance = await this.connectionProvider.wallet.update({
                 where: { userId: props.user.id },
                 data: {
                     balance: updateValue
@@ -111,7 +111,7 @@ export class WalletProvider implements IWallet {
 
             transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
             this.dataCreateTransaction = { data: transaction }
-            await this.connectionProvider.tb_transaction.create(this.dataCreateTransaction)
+            await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
             return { status: 200, message: "Withdraw made successfully." }
 
@@ -123,7 +123,7 @@ export class WalletProvider implements IWallet {
     async getExtract(props: any): Promise<Object> {
 
         try {
-            const findTransactions = await this.connectionProvider.tb_transaction.findMany({
+            const findTransactions = await this.connectionProvider.transaction.findMany({
                 where: { userId: props.id }
             })
 
@@ -144,7 +144,7 @@ export class WalletProvider implements IWallet {
 
     async getBalance(props: any): Promise<WalletEntities> {
         try {
-            return await this.connectionProvider.tb_wallet.findUnique({
+            return await this.connectionProvider.wallet.findUnique({
                 where: {
                     userId: props.id
                 }
