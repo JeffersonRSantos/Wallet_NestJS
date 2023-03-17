@@ -60,11 +60,11 @@ $ cd ./wallet && cp .env-example .env
 
 **Config to .env, ex:**
 
-SECRET_KEY=(secret on application)
-JWT_EXPIRES_IN=(ex: 1 day)
-DATABASE_URL=(default prisma mysql, ex: mysql://root:root@localhost:3306/wallet_nestjs)
-APP_PORT=(port on current application, ex: 4000, 4001, 4002)
-URL_MICROSERVICE_SHOPPING_PORT=(ex: http://localhost:4001)
+- SECRET_KEY=(secret on application)
+- JWT_EXPIRES_IN=(ex: 1 day)
+- DATABASE_URL=(default prisma mysql, ex: mysql://root:root@localhost:3306/wallet_nestjs)
+- APP_PORT=(port on current application, ex: 4000, 4001, 4002)
+- URL_MICROSERVICE_SHOPPING_PORT=(ex: http://localhost:4001)
 
 continue...
 
