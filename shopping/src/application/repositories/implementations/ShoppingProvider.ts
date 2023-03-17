@@ -1,5 +1,12 @@
+import { randomUUID } from "crypto";
+import * as moment from "moment";
+import * as dotnenv from "dotenv";
 import { ProductEntities } from "src/application/entities/ProductEntities";
+import { TransationEntities } from "src/application/entities/TransactionEntities";
 import { PrismaService } from "src/services/database/PrismaService";
+import { statusTransactionConstantEnum, typeTransactionConstantEnum } from "src/utils/enums";
+import { formatCurrencyEn, formatCurrencyPt } from "src/utils/formatCurrency";
+import { messageCustom, messageCustomError, messageSuccess } from "src/utils/lang/common";
 import { IShopping } from "../interfaces/IShopping";
 
 export class ShoppingProvider implements IShopping {
@@ -18,15 +25,129 @@ export class ShoppingProvider implements IShopping {
                     price: true
                 }
             })
-            
+
             return products
         } catch (error) {
             throw new Error(error);
         }
     }
-    async buyProduct(props: Object): Promise<ProductEntities> {
+
+    async buyProduct(props: any): Promise<Object> {
+
+        const { user, body } = props
+
         try {
-            return
+            const productInStock: ProductEntities = await this.connectionProvider.products.findFirst({
+                where: { code: body.code_product }
+            })
+
+            if(!productInStock) return
+
+            let price: any = productInStock.price
+
+            const totalPriceAmount: any = parseFloat(price) * (body?.amount || 1)
+
+            if (!(productInStock.stock >= body.amount)) return { message: messageCustom.WITHOUT_STOCK }
+
+            const getWallet = await this.connectionProvider.wallet.findUnique({
+                where: { userId: user.id },
+                select: { balance: true }
+            })
+
+            let balance: any = getWallet.balance
+
+            if (!(parseFloat(balance) >= totalPriceAmount)) return { message: messageCustom.INSUFFICIENT_BALANCE }
+
+            let updateBalance: any = parseFloat(balance) - parseFloat(totalPriceAmount)
+
+            const updateWallet = await this.connectionProvider.wallet.update({
+                where: { userId: user.id },
+                data: {
+                    balance: updateBalance
+                }
+            })
+
+            const updateStock = (productInStock.stock - body.amount)
+            productInStock.stock = updateStock
+
+            await this.connectionProvider.products.update({
+                where: { id: productInStock.id },
+                data: { stock: updateStock }
+            })
+
+            const uuidTransaction: any = randomUUID()
+
+            await this.connectionProvider.transaction.create({
+                data: {
+                    transactionId: uuidTransaction,
+                    value: parseFloat(totalPriceAmount),
+                    userId: user.id,
+                    typeTransaction: typeTransactionConstantEnum.BUY,
+                    productId: productInStock.id,
+                    statusTransaction: (updateWallet ? statusTransactionConstantEnum.SUCCESS : statusTransactionConstantEnum.FAILED)
+                }
+            })
+
+            return {
+                message: messageSuccess.SUCCESSFULLY_PURCHASE,
+                code: "clfcmvx4c0002gt3wpyrr5fvx",
+                nameProduct: "Recarga 50",
+                stock: 28,
+                price: formatCurrencyPt(parseFloat(productInStock.price))
+            }
+
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
+    async cancellation(props: any): Promise<Object> {
+
+        const { id } = props.user
+
+        try {
+            const existsTransaction: TransationEntities = await this.connectionProvider.transaction.findFirst({
+                where: { transactionId: props.code_transaction },
+                include: {
+                    product: {
+                        select: {
+                            name: true
+                        }
+                    }
+                },
+                orderBy: {  id: 'desc' },
+            })
+
+            const validateHours = moment(existsTransaction.createdAt).add(process.env.TRANSACTION_EXPIRES_IN_MINUTES, 'm').toDate();            
+            
+            if (statusTransactionConstantEnum.CANCELED == existsTransaction.statusTransaction) return { status: 500, message: messageCustom.TRANSACTION_ALREADY_CANCELED }
+            
+            if (moment(validateHours) < moment()) return { status: 500, message: messageCustom.TRANSACTION_EXPIRED_CANCELLATION }
+
+            if (!existsTransaction || existsTransaction.userId != id) return { status: 500, message: messageCustomError.NOT_FOUND_TRANSACTION };
+
+            const getWallet = await this.connectionProvider.wallet.findUnique({ where: { userId: id } })
+
+            const balance: any = getWallet.balance
+
+            const updateBalance = parseFloat(balance) + parseFloat(existsTransaction.value)
+
+            const updateWallet = await this.connectionProvider.wallet.update({
+                where: { userId: id }, data: { balance: updateBalance }
+            })
+
+            await this.connectionProvider.transaction.create({
+                data: {
+                    transactionId: existsTransaction.transactionId,
+                    value: existsTransaction.value,
+                    userId: existsTransaction.userId,
+                    typeTransaction: existsTransaction.typeTransaction,
+                    productId: (existsTransaction.productId ?? null),
+                    statusTransaction: (updateWallet ? statusTransactionConstantEnum.CANCELED : statusTransactionConstantEnum.FAILED)
+                }
+            })
+
+            return existsTransaction
         } catch (error) {
             throw new Error(error);
         }

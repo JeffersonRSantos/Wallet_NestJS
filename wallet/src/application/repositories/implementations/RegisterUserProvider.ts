@@ -11,7 +11,13 @@ export class RegisterUserProvider implements IRegisterUser {
     async create(props: any): Promise<any> {
         try {
             props.data.password = bcrypt.hashSync(props.data.password, 10);
-            await this.connectionProvider.user.create(props)
+            const user = await this.connectionProvider.user.create(props)
+            await this.connectionProvider.wallet.create({
+                data: {
+                    userId: user.id,
+                    balance: 0.00
+                }
+            })
         } catch (e) {
             if (e instanceof Prisma.PrismaClientKnownRequestError) {
                 if (e.code === 'P2002') {

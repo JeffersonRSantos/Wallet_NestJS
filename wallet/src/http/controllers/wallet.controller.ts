@@ -6,6 +6,7 @@ import { WalletEntities } from 'src/application/entities/WalletEntities';
 import { getExtractUseCase, getMoneyUseCase, setMoneyUseCase, getBalanceUseCase } from 'src/application/useCases/Wallet';
 import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
 import { formatCurrencyPt } from 'src/utils/formatCurrency';
+import { messageCustom, messageCustomErrors } from 'src/utils/lang/common';
 import { WalletDTO } from '../dtos/WalletDTO';
 import { setMoneySchema } from '../schemas/SetMoneySchema';
 
@@ -35,8 +36,7 @@ export class WalletController {
       const set: any = await this.setMoney.execute({ value: formatCurrency, user })
       return resp.status(set?.status || 201).json(set)
     } catch (error) {
-      throw new Error(error.message);
-
+      throw new Error(messageCustomErrors.ERROR_CONTROLLER+" (/wallet/_add) "+error.message);
     }
   }
 
@@ -59,7 +59,7 @@ export class WalletController {
       const set: any = await this.getMoney.execute({ value: formatCurrency, user })
       return resp.status(set?.status || 201).json(set)
     } catch (error) {
-      throw new Error(error.message);
+      throw new Error(messageCustomErrors.ERROR_CONTROLLER+" (/wallet/_withdraw) "+error.message);
     }
   }
 
@@ -72,9 +72,10 @@ export class WalletController {
 
     try {
       const findExtract: any = await this.getExtract.execute(userAuth)
+      
       return resp.status(findExtract?.status || 200).json(findExtract)
     } catch (error) {
-      throw new Error(error.message);
+      throw new Error(messageCustomErrors.ERROR_CONTROLLER+" (/wallet/_extract) "+error.message);
     }
   }
 
@@ -88,12 +89,12 @@ export class WalletController {
     try {
       const b: WalletEntities = await this.getBalance.execute(user)
       return {
-        message: (b.balance > 0 ? 'Balance available in account.': 'Unavailable balance in account'),
+        message: (b.balance > 0 ? messageCustom.BALANCE_AVAILABLE: messageCustom.BALANCE_UNAVAILABLE),
         balance: formatCurrencyPt(parseFloat(b.balance)),
-        creditCardStatus: (b.active_credit_card ? 'Credit Card Actived' : 'Credit Card Desactived')
+        creditCardStatus: (b.active_credit_card ? messageCustom.CREDIT_CARD_ACTIVED : messageCustom.CREDIT_CARD_DESACTIVED)
       }
     } catch (error) {
-      throw new Error(error.message);
+      throw new Error(messageCustomErrors.ERROR_CONTROLLER+" (/wallet/_balance) "+error.message);
 
     }
   }

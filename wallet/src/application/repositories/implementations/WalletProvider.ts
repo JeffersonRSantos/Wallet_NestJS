@@ -4,6 +4,7 @@ import { WalletEntities } from "src/application/entities/WalletEntities";
 import { PrismaService } from "src/services/database/PrismaService";
 import { statusTransactionConstantEnum, statusTransactionEnum, typeTransactionConstantEnum, typeTransactionEnum } from "src/utils/enums";
 import { formatCurrencyPt } from "src/utils/formatCurrency";
+import { messageCustom, messageCustomErrors, messageCustomSuccess } from "src/utils/lang/common";
 import { IWallet } from "../interfaces/IWallet";
 
 export class WalletProvider implements IWallet {
@@ -35,34 +36,22 @@ export class WalletProvider implements IWallet {
                 }
             })
 
-            if (!getWallet) {
-                const create: WalletEntities = await this.connectionProvider.wallet.create({
-                    data: {
-                        userId: props.user.id,
-                        balance: props.value
-                    }
-                })
+            const updateValue = (parseFloat(getWallet.balance) + parseFloat(props.value))
+            const updateBalance = await this.connectionProvider.wallet.update({
+                where: { userId: props.user.id },
+                data: {
+                    balance: updateValue
+                }
+            })
 
-                if (!create) return { status: 409, messsage: "Erro to create wallet." }
-
-            } else {
-                const updateValue = (parseFloat(getWallet.balance) + parseFloat(props.value))
-                const updateBalance = await this.connectionProvider.wallet.update({
-                    where: { userId: props.user.id },
-                    data: {
-                        balance: updateValue
-                    }
-                })
-
-                if (!updateBalance) return { status: 409, messsage: "Erro to update balance on wallet." }
-            }
+            if (!updateBalance) return { status: 409, messsage: messageCustomErrors.ERROR_UPDATE_BALANCE }
 
             transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
 
             this.dataCreateTransaction = { data: transaction }
             await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
-            return { message: "Deposit made successfully." }
+            return { message: messageCustomSuccess.DEPOSIT_SUCCESSFULLY }
         } catch (error) {
 
             transaction.statusTransaction = statusTransactionConstantEnum.FAILED
@@ -92,12 +81,10 @@ export class WalletProvider implements IWallet {
                 }
             })
 
-            if (!getWallet) return { status: 200, messsage: "Ops... You have no balance." }
-
             const value = parseFloat(props.value)
             const balance = parseFloat(getWallet.balance)
 
-            if (value > balance) return { status: 401, message: 'Amount greater than the balance.' }
+            if (value > balance) return { status: 401, message: messageCustom.AMOUNT_GREATER_ON_BALANCE }
 
             const updateValue = (parseFloat(getWallet.balance) - parseFloat(props.value))
             const updateBalance = await this.connectionProvider.wallet.update({
@@ -107,13 +94,13 @@ export class WalletProvider implements IWallet {
                 }
             })
 
-            if (!updateBalance) return { status: 409, messsage: "Erro to update balance on wallet." }
+            if (!updateBalance) return { status: 409, messsage: messageCustomErrors.ERROR_UPDATE_BALANCE }
 
             transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
             this.dataCreateTransaction = { data: transaction }
             await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
-            return { status: 200, message: "Withdraw made successfully." }
+            return { status: 200, message: messageCustomSuccess.WITHDRAWAL_SUCCESSFULLY }
 
         } catch (error) {
             return { status: 500, error }
@@ -127,7 +114,7 @@ export class WalletProvider implements IWallet {
                 where: { userId: props.id }
             })
 
-            if (!findTransactions) return { message: 'Not Found Extract.' }
+            if (!findTransactions || findTransactions.length === 0) return { message: messageCustom.WITHOUT_REGISTERS_EXTRACT }
 
             for (const [key, item] of Object.entries(findTransactions)) {
                 findTransactions[key].value = formatCurrencyPt(item.value)

@@ -4,6 +4,7 @@ import { JwtStrategy } from './application/useCases/AuthLogin/strategy/jwt.strat
 import { AppController } from './http/controllers/app.controller';
 import { ShoppingController } from './http/controllers/shopping.controller';
 import { WalletController } from './http/controllers/wallet.controller';
+import { PrismaService } from './services/database/PrismaService';
 import { ShoppingService } from './services/microservices/ShoppingService';
 
 @Module({
@@ -18,7 +19,7 @@ import { ShoppingService } from './services/microservices/ShoppingService';
     WalletController,
     ShoppingController
   ],
-  providers: [JwtStrategy, ShoppingService],
+  providers: [JwtStrategy, ShoppingService, PrismaService],
 })
 
 export class AppModule { }

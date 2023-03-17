@@ -2,8 +2,10 @@ export class TransationEntities{
     public id?: number
     public userId?: number
     public transactionId?: string
-    public value?: number
+    public value?: any
     public typeTransaction?: number
     public statusTransaction?: number
-    public createdAt?: string
+    public productId?: number
+    public createdAt?: Date
+    public updatedAt?: Date
 }

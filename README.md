@@ -1,13 +1,14 @@
 # 💲Wallet Nestjs
 
-## Descrição do projeto
+## 📜🚀 Descrição do projeto
 
 <p>Estrutura baseada em microservices, existem 2 serviços, cada um com sua responsabilidade. O serviço principal é <strong>Wallet</strong>, além de ter algumas responsabilidades ele também é responsável por fazer a <strong>interface</strong> e solicitar aos demais serviços seus processamentos de dados.</p>
 
 **Infra dos serviços:**
 
-- Wallet (roda na porta 4000)
+- Wallet (roda na porta 4000) (serviço principal das requisições)
 - Shopping (roda na porta 4001)
+- Mysql (roda na porta 3306)
 
 ------
 
@@ -29,6 +30,18 @@ D — Dependency Inversion Principle (Princípio da inversão da dependência)
 
 - <a href="https://www.techtarget.com/whatis/definition/clean-architecture" target="_blank">Mais Sobre Clean Architecture</a>
 
+## 🚀📜 - Endpoints
+
+1.  GET (/_health) -> Use para saber como está a conectividade dos serviços.
+2.  POST (/_register) -> Crie um novo usuário para começar a ultilizar a Wallet.
+3.  POST (/_login) -> Autentique seu usuário.
+4.  POST (/wallet/_add) -> Carregue com alguns _moneys_ sua carteira.
+5.  POST (/wallet/_withdraw) -> Saque a qualquer momento que preferir.
+6.  GET (/wallet/_balance) -> Consulte seu saldo.
+7.  GET (/wallet/_extract) -> Veja o extrato de todas suas transações.
+8.  GET (/shopping/_list_products) -> Agora já podemos adquirir produtos! Veja o catálogo.
+9.  POST (/shopping/_buy_product) -> Digite o código do produto e adquira.
+10. POST (/shopping/_cancellation) -> Comprou por enquando ou não deseja mais o produto? Use esse endpoint para fazer o cancelamento. (obs: Após a compra de cada produto, o prazo é no máximo 30 minutos para realizar o cancelamento).
 
 ## 🚀📜 - SWAGGER
 
@@ -69,8 +82,13 @@ $ docker-compose up -d
 $ docker exec -it wallet_app_container /bin/sh -c "npx prisma migrate dev; npx prisma db seed"
 ```
 
+**Agora já podemos fazer um teste para saber se tudo está em ordem!**
 
-## Testes (End-to-End)
+<p>Entre no Swagger/Postman, e execute a rota */_health*</p>
+
+-----------
+
+## 🚀🦾 Testes (End-to-End)
 
 ```bash
 # unit tests
@@ -84,17 +102,17 @@ $ yarn run test:cov
 ```
 
 
-## Próximos passos de upgrade
+## 🚀🪧 Próximos passos de upgrade
 
 ### Etapa 1
 
-- O microservice responsável por buscar de dados, terá os dados do cache, assim em altas requisições não afetará o banco de dados (DB ReadOnly, Redis)
-- WalletInterface seria a segregação do serviço *Wallet*, seria responsável apenas por receber as requisições e chamar os microservices necessários
-- Banco não relacional para logs (alternativa)
-- Adicionar microservice de notificações (notificar o usuário dos status dos eventos)
-- Tabela para tipagem dos enums (hoje está dentro da aplicação o significado os IDs)
-- Fluxo de log para os microservices que recebem solicitações (hoje não salva em nenhum lugar essas informações)
-- Microservice para fluxo de emissão de notas, após o cliente adquirir uma compra
+- O microservice responsável por buscar de dados, terá os dados do cache, assim em altas requisições não afetará o banco de dados (DB ReadOnly, Redis).
+- WalletInterface seria a segregação do serviço *Wallet*, seria responsável por receber apenas as requisições e chamar os microservices necessários.
+- Banco não relacional para logs (alternativa).
+- Adicionar microservice de notificações (notificar o usuário dos status dos eventos).
+- Tabela para tipagem dos enums (hoje está dentro da aplicação o significado os IDs).
+- Fluxo de log para os microservices que recebem solicitações (hoje não salva em nenhum lugar essas informações).
+- Microservice para fluxo de emissão de notas, após o cliente adquirir uma compra.
 
 ### Etapa 2
 
@@ -120,7 +138,7 @@ $ yarn run test:cov
 5. failed
 
 
-## Demais informações
+## 🚀🦉 Demais informações
 
 - Author - [Jefferson Santos]
 - Portfólio - [https://jeffersonfullstackweb.com.br](https://jeffersonfullstackweb.com.br)

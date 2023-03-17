@@ -39,3 +39,4 @@ lerna-debug.log*
 
 # ENV
 .env
+yarn.lock
