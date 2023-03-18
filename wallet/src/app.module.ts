@@ -12,14 +12,18 @@ import { ShoppingService } from './services/microservices/ShoppingService';
     HttpModule.register({
       timeout: 60,
       maxRedirects: 5,
-    }),
+    })
   ],
   controllers: [
     AppController,
     WalletController,
     ShoppingController
   ],
-  providers: [JwtStrategy, ShoppingService, PrismaService],
+  providers: [
+    JwtStrategy, 
+    ShoppingService, 
+    PrismaService
+  ],
 })
 
 export class AppModule { }
