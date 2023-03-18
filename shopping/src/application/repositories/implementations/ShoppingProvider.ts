@@ -1,14 +1,16 @@
 import { randomUUID } from "crypto";
+import { Injectable } from '@nestjs/common'
 import * as moment from "moment";
 import * as dotnenv from "dotenv";
 import { ProductEntities } from "src/application/entities/ProductEntities";
 import { TransationEntities } from "src/application/entities/TransactionEntities";
 import { PrismaService } from "src/services/database/PrismaService";
 import { statusTransactionConstantEnum, typeTransactionConstantEnum } from "src/utils/enums";
-import { formatCurrencyEn, formatCurrencyPt } from "src/utils/formatCurrency";
-import { messageCustom, messageCustomError, messageSuccess } from "src/utils/lang/common";
+import { formatCurrencyPt } from "src/utils/formatCurrency";
 import { IShopping } from "../interfaces/IShopping";
+import { MessageCustom, MessageCustomError, MessageSuccess } from "src/utils/lang/common";
 
+@Injectable()
 export class ShoppingProvider implements IShopping {
     constructor(
         private connectionProvider: PrismaService
@@ -47,7 +49,7 @@ export class ShoppingProvider implements IShopping {
 
             const totalPriceAmount: any = parseFloat(price) * (body?.amount || 1)
 
-            if (!(productInStock.stock >= body.amount)) return { message: messageCustom.WITHOUT_STOCK }
+            if (!(productInStock.stock >= body.amount)) return { message: MessageCustom.WITHOUT_STOCK }
 
             const getWallet = await this.connectionProvider.wallet.findUnique({
                 where: { userId: user.id },
@@ -56,7 +58,7 @@ export class ShoppingProvider implements IShopping {
 
             let balance: any = getWallet.balance
 
-            if (!(parseFloat(balance) >= totalPriceAmount)) return { message: messageCustom.INSUFFICIENT_BALANCE }
+            if (!(parseFloat(balance) >= totalPriceAmount)) return { message: MessageCustom.INSUFFICIENT_BALANCE }
 
             let updateBalance: any = parseFloat(balance) - parseFloat(totalPriceAmount)
 
@@ -89,7 +91,7 @@ export class ShoppingProvider implements IShopping {
             })
 
             return {
-                message: messageSuccess.SUCCESSFULLY_PURCHASE,
+                message: MessageSuccess.SUCCESSFULLY_PURCHASE,
                 code: "clfcmvx4c0002gt3wpyrr5fvx",
                 nameProduct: "Recarga 50",
                 stock: 28,
@@ -118,13 +120,13 @@ export class ShoppingProvider implements IShopping {
                 orderBy: {  id: 'desc' },
             })
 
+            if (!existsTransaction || existsTransaction.userId != id) return { status: 200, message: MessageCustomError.NOT_FOUND_TRANSACTION };
+
             const validateHours = moment(existsTransaction.createdAt).add(process.env.TRANSACTION_EXPIRES_IN_MINUTES, 'm').toDate();            
             
-            if (statusTransactionConstantEnum.CANCELED == existsTransaction.statusTransaction) return { status: 500, message: messageCustom.TRANSACTION_ALREADY_CANCELED }
+            if (statusTransactionConstantEnum.CANCELED == existsTransaction.statusTransaction) return { status: 200, message: MessageCustom.TRANSACTION_ALREADY_CANCELED }
             
-            if (moment(validateHours) < moment()) return { status: 500, message: messageCustom.TRANSACTION_EXPIRED_CANCELLATION }
-
-            if (!existsTransaction || existsTransaction.userId != id) return { status: 500, message: messageCustomError.NOT_FOUND_TRANSACTION };
+            if (moment(validateHours) < moment()) return { status: 200, message: MessageCustom.TRANSACTION_EXPIRED_CANCELLATION }
 
             const getWallet = await this.connectionProvider.wallet.findUnique({ where: { userId: id } })
 

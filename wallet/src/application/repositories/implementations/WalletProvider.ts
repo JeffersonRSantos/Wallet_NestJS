@@ -1,12 +1,14 @@
+import { Injectable } from "@nestjs/common/decorators";
 import { randomUUID } from "crypto";
-import { TransationEntities } from "src/application/entities/TransactionEntities";
-import { WalletEntities } from "src/application/entities/WalletEntities";
-import { PrismaService } from "src/services/database/PrismaService";
-import { statusTransactionConstantEnum, statusTransactionEnum, typeTransactionConstantEnum, typeTransactionEnum } from "src/utils/enums";
-import { formatCurrencyPt } from "src/utils/formatCurrency";
-import { messageCustom, messageCustomErrors, messageCustomSuccess } from "src/utils/lang/common";
+import { TransationEntities } from "../../../../src/application/entities/TransactionEntities";
+import { WalletEntities } from "../../../../src/application/entities/WalletEntities";
+import { PrismaService } from "../../../../src/services/database/PrismaService";
+import { statusTransactionConstantEnum, statusTransactionEnum, typeTransactionConstantEnum, typeTransactionEnum } from "../../../../src/utils/enums";
+import { formatCurrencyPt } from "../../../../src/utils/formatCurrency";
+import { MessageCustom, MessageCustomErrors, MessageCustomSuccess } from "../../../../src/utils/lang/common";
 import { IWallet } from "../interfaces/IWallet";
 
+@Injectable()
 export class WalletProvider implements IWallet {
     constructor(
         private connectionProvider: PrismaService
@@ -24,9 +26,9 @@ export class WalletProvider implements IWallet {
             userId: props.user.id,
             typeTransaction: typeTransactionConstantEnum.DEPOSIT
         }
-
+        
         try {
-
+            
             this.dataCreateTransaction = { data: transaction }
             await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
@@ -44,14 +46,14 @@ export class WalletProvider implements IWallet {
                 }
             })
 
-            if (!updateBalance) return { status: 409, messsage: messageCustomErrors.ERROR_UPDATE_BALANCE }
+            if (!updateBalance) return { status: 409, messsage: MessageCustomErrors.ERROR_UPDATE_BALANCE }
 
             transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
 
             this.dataCreateTransaction = { data: transaction }
             await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
-            return { message: messageCustomSuccess.DEPOSIT_SUCCESSFULLY }
+            return { message: MessageCustomSuccess.DEPOSIT_SUCCESSFULLY }
         } catch (error) {
 
             transaction.statusTransaction = statusTransactionConstantEnum.FAILED
@@ -84,7 +86,7 @@ export class WalletProvider implements IWallet {
             const value = parseFloat(props.value)
             const balance = parseFloat(getWallet.balance)
 
-            if (value > balance) return { status: 401, message: messageCustom.AMOUNT_GREATER_ON_BALANCE }
+            if (value > balance) return { status: 401, message: MessageCustom.AMOUNT_GREATER_ON_BALANCE }
 
             const updateValue = (parseFloat(getWallet.balance) - parseFloat(props.value))
             const updateBalance = await this.connectionProvider.wallet.update({
@@ -94,13 +96,13 @@ export class WalletProvider implements IWallet {
                 }
             })
 
-            if (!updateBalance) return { status: 409, messsage: messageCustomErrors.ERROR_UPDATE_BALANCE }
+            if (!updateBalance) return { status: 409, messsage: MessageCustomErrors.ERROR_UPDATE_BALANCE }
 
             transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
             this.dataCreateTransaction = { data: transaction }
             await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
-            return { status: 200, message: messageCustomSuccess.WITHDRAWAL_SUCCESSFULLY }
+            return { status: 200, message: MessageCustomSuccess.WITHDRAWAL_SUCCESSFULLY }
 
         } catch (error) {
             return { status: 500, error }
@@ -114,7 +116,7 @@ export class WalletProvider implements IWallet {
                 where: { userId: props.id }
             })
 
-            if (!findTransactions || findTransactions.length === 0) return { message: messageCustom.WITHOUT_REGISTERS_EXTRACT }
+            if (!findTransactions || findTransactions.length === 0) return { message: MessageCustom.WITHOUT_REGISTERS_EXTRACT }
 
             for (const [key, item] of Object.entries(findTransactions)) {
                 findTransactions[key].value = formatCurrencyPt(item.value)

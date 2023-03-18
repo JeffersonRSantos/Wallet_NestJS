@@ -1,5 +1,7 @@
-import { WalletProvider } from "src/application/repositories/implementations/WalletProvider";
+import { Injectable } from "@nestjs/common";
+import { WalletProvider } from "../../../../src/application/repositories/implementations/WalletProvider";
 
+@Injectable()
 export class GetMoneyUseCase{
     constructor(
         private walletProvider: WalletProvider

@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client'
+import * as bcrypt from 'bcrypt';
+
 const prisma = new PrismaClient()
 async function main() {
     const seedOne = await prisma.products.upsert({
@@ -61,7 +63,25 @@ async function main() {
             stock: 0
         }
     })
-    console.log({ seedOne, seedTwo, seedThree, seedFor, seedFive, seedSix })
+    const seedSeven = await prisma.user.upsert({
+        where: { id: 0},
+        update: {},
+        create: {
+            name: 'Jefferson',
+            email: 'jefferson@teste.com',
+            cpf: '88008555041',
+            password: bcrypt.hashSync('554433', 10)
+        }
+    })
+    const seedSeven_wallet = await prisma.wallet.upsert({
+        where: { id: 0},
+        update: {},
+        create: {
+            userId: seedSeven.id,
+            balance: 0
+        }
+    })
+    console.log({ seedOne, seedTwo, seedThree, seedFor, seedFive, seedSix, seedSeven, seedSeven_wallet})
 }
 main()
     .then(async () => {

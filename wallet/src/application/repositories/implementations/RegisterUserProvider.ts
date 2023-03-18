@@ -1,8 +1,10 @@
-import { PrismaService } from "src/services/database/PrismaService";
+import { PrismaService } from "../../../../src/services/database/PrismaService";
 import { IRegisterUser } from "../interfaces/IRegisterUser";
 import * as bcrypt from 'bcrypt';
 import { Prisma } from "@prisma/client";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class RegisterUserProvider implements IRegisterUser {
     constructor(
         private connectionProvider: PrismaService

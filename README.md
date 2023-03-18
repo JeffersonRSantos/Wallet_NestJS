@@ -10,6 +10,10 @@
 - Shopping (roda na porta 4001)
 - Mysql (roda na porta 3306)
 
+**Arquitetura**
+
+![plot](./fluxograma.jpg)
+
 ------
 
 **Projeto desenvolvido com os seguintes padrões:**

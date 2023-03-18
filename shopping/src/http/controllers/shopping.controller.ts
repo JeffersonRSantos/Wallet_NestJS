@@ -3,19 +3,24 @@ import { ApiBearerAuth } from "@nestjs/swagger";
 import { Request, Response } from "express";
 import { AuthLoginEntities } from "src/application/entities/AuthLoginEntities";
 import { ProductEntities } from "src/application/entities/ProductEntities";
-import { buyProductUseCase, getListProductsUseCase, cancellationUseCase } from "src/application/useCases/Shopping";
+import { BuyProductUseCase } from "src/application/useCases/Shopping/BuyProductUseCase";
+import { CancellationUseCase } from "src/application/useCases/Shopping/CancellationUseCase";
+import { ListProductsUseCase } from "src/application/useCases/Shopping/ListProductsUseCase";
 import { JwtAuthGuard } from "src/core/guards/jwt-auth.guard";
 import { typeTransactionEnum } from "src/utils/enums";
 import { formatCurrencyPt } from "src/utils/formatCurrency";
-import { messageCustomError } from "src/utils/lang/common";
+import { MessageCustomError } from "src/utils/lang/common";
 import { BuyProductDTO } from "../dtos/BuyProductDTO";
 import { CancellationDTO } from "../dtos/CancellationDTO";
 
 @Controller()
 export class ShoppingController {
-    public listProductsUseCase = getListProductsUseCase
-    public buyProductUseCase = buyProductUseCase
-    public cancellationUseCase = cancellationUseCase
+
+    constructor(
+        private listProductsUseCase: ListProductsUseCase,
+        private buyProductUseCase: BuyProductUseCase,
+        private cancellationUseCase: CancellationUseCase
+    ){}
 
     @UseGuards(JwtAuthGuard)
     @Get('_list_products')
@@ -30,7 +35,7 @@ export class ShoppingController {
 
             return items
         } catch (error) {
-            throw new Error(messageCustomError.ERROR_CONTROLLER + " (/_list_products)" + error.message);
+            throw new Error(MessageCustomError.ERROR_CONTROLLER + " (/_list_products)" + error.message);
         }
     }
 
@@ -46,7 +51,7 @@ export class ShoppingController {
 
             return resp.status(200).json(items)
         } catch (error) {
-            throw new Error(messageCustomError.ERROR_CONTROLLER + " (/_buy_product)" + error.message);
+            throw new Error(MessageCustomError.ERROR_CONTROLLER + " (/_buy_product)" + error.message);
         }
     }
 
@@ -73,7 +78,7 @@ export class ShoppingController {
 
             return resp.status(cancel?.status || 200).json({response: cancel})
         } catch (error) {
-            throw new Error(messageCustomError.ERROR_CONTROLLER + " (/_cancellation)" + error.message);
+            throw new Error(MessageCustomError.ERROR_CONTROLLER + " (/_cancellation)" + error.message);
         }
     }
 }
