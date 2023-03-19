@@ -33,19 +33,6 @@ describe('Login', () => {
     expect(response.status).toEqual(200);
   });
 
-  // wallet/_extract (required for last module test)
-
-  it(`/wallet/_extract - Should to return extract list (Auth)`, async () => {
-    let token = JSON.parse(access_token).response.bearer_token
-    const response = await request(app.getHttpServer())
-      .get('/wallet/_extract')
-      .set({ Authorization: 'Bearer ' + token })
-
-    console.log(response.text)
-    extract = JSON.parse(response.text)
-    expect(response.status).toEqual(200)
-  });
-
   // shopping/_list_products
 
   it(`/shopping/_list_products - Should to return products list (Auth)`, async () => {

@@ -96,9 +96,6 @@ $ yarn run start:prod
 ```bash
 # Compile images
 $ docker-compose up -d
-
-# Run migrates and seeds
-$ docker exec -it wallet_app_container /bin/sh -c "npx prisma migrate dev; npx prisma db seed"
 ```
 
 **Agora já podemos fazer um teste para saber se tudo está em ordem!**

@@ -1,10 +1,10 @@
 FROM node:16
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/wallet
 
 COPY . .
 
-RUN yarn install
+RUN yarn
 RUN yarn build
 RUN npm install -g npm@9.6.2
 
