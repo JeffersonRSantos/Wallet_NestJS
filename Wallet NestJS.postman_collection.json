@@ -1,0 +1,373 @@
+{
+	"info": {
+		"_postman_id": "7103dabb-bf3c-4998-aca4-2f26bafdb14b",
+		"name": "Wallet NestJS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10962249"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Check Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/_health",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"_health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Token",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"jefferson@teste.com\",\r\n    \"password\": \"1234567\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/_login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"_login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"jefferson santos\",\r\n    \"email\": \"jefferson@teste.com\",\r\n    \"password\": \"1234567\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/_register",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"_register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Wallet",
+			"item": [
+				{
+					"name": "Add Money",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"value\": \"23,90\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/wallet/_add",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"wallet",
+								"_add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw money",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"value\": \"10,00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/wallet/_withdraw",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"wallet",
+								"_withdraw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consult Balance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/wallet/_balance",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"wallet",
+								"_balance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consult Extract",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/wallet/_extract",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"wallet",
+								"_extract"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shopping",
+			"item": [
+				{
+					"name": "List Products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/shopping/_list_products",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"shopping",
+								"_list_products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code_product\": \"clfcmvx4c0002gt3wpyrr5fvx\",\r\n    \"amount\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/shopping/_buy_product",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"shopping",
+								"_buy_product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancellation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code_transaction\": \"7157db71-3a80-4324-abcf-1d647bea3731\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/shopping/_cancellation",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"shopping",
+								"_cancellation"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:4000",
+			"type": "string"
+		},
+		{
+			"key": "TOKEN",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqZWZmZXJzb25AdGVzdGUuY29tIiwid2FsbGV0Ijp7ImJhbGFuY2UiOiIyNDcuNjQiLCJhY3RpdmVfY3JlZGl0X2NhcmQiOnRydWV9LCJpYXQiOjE2NzkxNzUwMDQsImV4cCI6MTY3OTI2MTQwNH0.GGd6JuUs4tpPOC1aAAtSfnCw-7URe4Wiw4WlG2qq7n4",
+			"type": "string"
+		}
+	]
+}

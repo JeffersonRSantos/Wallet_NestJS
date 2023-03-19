@@ -1,6 +1,5 @@
 import { HttpService } from '@nestjs/axios';
 import { Controller, Get } from '@nestjs/common';
-import { PrismaService } from '../../../src/services/database/PrismaService';
 import { MessageCustom } from '../../../src/utils/lang/common';
 
 @Controller()

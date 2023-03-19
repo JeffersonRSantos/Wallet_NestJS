@@ -6,9 +6,7 @@ import { AppModule } from '../src/app.module';
 describe('Login', () => {
   let app: INestApplication;
   let access_token: string
-  let products: any
-  let extract: any
-
+  
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule]
@@ -33,16 +31,28 @@ describe('Login', () => {
     expect(response.status).toEqual(200);
   });
 
-  it(`/_login - Login no Authentication`, async () => {
-    let token = JSON.parse(access_token).response.bearer_token
+  //Register
+
+  it(`/_register - Register to new user`, async () => {
     const response = await request(app.getHttpServer())
-      .post('/_login')
+      .post('/_register')
       .type('json')
-      .send({ email: "joao@teste.com", password: "0000" })
+      .send({ name: "João Pedro", email: "joao@pedro.com", password: "10203040", cpf: "47389723477" })
       .set('Accept', 'application/json')
       .expect('Content-Type', 'application/json; charset=utf-8')
 
-    expect(response.status).toEqual(403);
+    expect(response.status).toEqual(201);
+  });
+
+  it(`/_register - Double register -> Should to be return user exists `, async () => {
+    const response = await request(app.getHttpServer())
+      .post('/_register')
+      .type('json')
+      .send({ name: "João Pedro", email: "joao@pedro.com", password: "10203040", cpf: "47389723477" })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+
+    expect(response.status).toEqual(409);
   });
 
   afterAll(async () => {

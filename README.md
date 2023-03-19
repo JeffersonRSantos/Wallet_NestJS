@@ -18,7 +18,6 @@
 
 **Projeto desenvolvido com os seguintes padrões:**
 
-- POO (Programação Orientada a Objetos)
 - S.O.L.I.D
 - Clean Architecture
 - TDD (e2e)
@@ -108,17 +107,18 @@ $ docker exec -it wallet_app_container /bin/sh -c "npx prisma migrate dev; npx p
 
 -----------
 
-## 🚀🦾 Testes (End-to-End)
+## 🚀🦾 Testes (e2e)
 
 ```bash
-# unit tests
-$ yarn run test
-
 # e2e tests
 $ yarn run test:e2e
+```
 
-# test coverage
-$ yarn run test:cov
+**Executar no docker**
+
+```bash
+# run on docker
+$ docker exec -it wallet_app_container /bin/sh -c "yarn run test:e2e"
 ```
 
 
