@@ -46,8 +46,8 @@ services:
       - 4000:4000
     healthcheck:
       test: "curl -f localhost:4000"
-      interval: 5s
-      timeout: 5s
+      interval: 10s
+      timeout: 10s
       retries: 5
       start_period: 40s
     volumes:
