@@ -44,6 +44,12 @@ services:
       - ./wallet/.env
     ports:
       - 4000:4000
+    healthcheck:
+      test: "curl -f localhost:4000"
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes:
       - ./wallet:/usr/app
     links:
@@ -53,8 +59,10 @@ services:
 
   shopping-service:
     depends_on:
-      - mysql
-      - wallet-service
+      mysql:
+        condition: service_healthy
+      wallet-service:
+        condition: service_healthy
     restart: always
     container_name: 'shopping_app_container'
     build: ./shopping
