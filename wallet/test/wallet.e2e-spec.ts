@@ -78,7 +78,7 @@ describe('Login', () => {
       .post('/wallet/_withdraw')
       .set({ Authorization: 'Bearer ' + token })
       .set('Accept', 'application/json')
-      .send({ value: "11,24" })
+      .send({ value: "2,24" })
       .expect('Content-Type', 'application/json; charset=utf-8')
 
     console.log(response.text)
