@@ -51,6 +51,8 @@ D — Dependency Inversion Principle (Princípio da inversão da dependência)
 
 **Antes de mais nada, além de toda essa documentação e utilitários que está na raiz do projeto, temos o Swagger para facilitar ainda mais o uso da API, acesse -> {URL}/docs**
 
+- O Swagger é, basicamente, um conjunto de ferramentas que nos ajuda a fazer o design, ou seja, fazer a modelagem, a documentar e até gerar código para desenvolvimento de APIs.
+
 
 ## 🚀▶ - Execute o projeto rodando:
 
