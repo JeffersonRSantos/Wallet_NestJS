@@ -26,9 +26,9 @@ export class WalletProvider implements IWallet {
             userId: props.user.id,
             typeTransaction: typeTransactionConstantEnum.DEPOSIT
         }
-        
+
         try {
-            
+
             this.dataCreateTransaction = { data: transaction }
             await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
@@ -113,7 +113,8 @@ export class WalletProvider implements IWallet {
 
         try {
             const findTransactions = await this.connectionProvider.transaction.findMany({
-                where: { userId: props.id }
+                where: { userId: props.id },
+                include: { product: true },
             })
 
             if (!findTransactions || findTransactions.length === 0) return { message: MessageCustom.WITHOUT_REGISTERS_EXTRACT }
