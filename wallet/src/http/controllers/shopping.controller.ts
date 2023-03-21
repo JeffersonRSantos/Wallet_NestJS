@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards, Req, Res, Body, Post } from "@nestjs/common";
-import { ApiBasicAuth } from "@nestjs/swagger";
+import { ApiBearerAuth } from "@nestjs/swagger";
 import { Request, Response } from "express";
 import { JwtAuthGuard } from "../../../src/core/guards/jwt-auth.guard";
 import { ShoppingService } from "../../../src/services/microservices/ShoppingService";
@@ -17,7 +17,7 @@ export class ShoppingController{
     ){}
 
     @UseGuards(JwtAuthGuard)
-    @ApiBasicAuth()
+    @ApiBearerAuth()
     @Get('_list_products')
     async getListProducts(@Req() req: Request): Promise<Object>{
         try {
@@ -30,7 +30,7 @@ export class ShoppingController{
     }
 
     @UseGuards(JwtAuthGuard)
-    @ApiBasicAuth()
+    @ApiBearerAuth()
     @Post('_buy_product')
     async buyProduct(@Req() req: Request, @Body() body: BuyProductDTO, @Res() resp: Response): Promise<Object>{
 
@@ -52,7 +52,7 @@ export class ShoppingController{
     }
 
     @UseGuards(JwtAuthGuard)
-    @ApiBasicAuth()
+    @ApiBearerAuth()
     @Post('_cancellation')
     async cancellation(@Req() req: Request, @Body() body: CancellationProductDTO, @Res() resp: Response): Promise<Object>{
 
