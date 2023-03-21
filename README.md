@@ -132,6 +132,7 @@ $ docker exec -it wallet_app_container /bin/sh -c "yarn run test:e2e"
 - Tabela para tipagem dos enums (hoje está dentro da aplicação o significado os IDs).
 - Fluxo de log para os microservices que recebem solicitações (hoje não salva em nenhum lugar essas informações).
 - Microservice para fluxo de emissão de notas, após o cliente adquirir uma compra.
+- Implementação de testes de stress, afim que saber a capacidade de requições por segundo da aplicação. (Benchmark profundo dos endpoints)
 
 ### Etapa 2
 
