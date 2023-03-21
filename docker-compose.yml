@@ -22,7 +22,7 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-uroot", "-p123456"]
       interval: 5s
       timeout: 5s
-      retries: 3
+      retries: 5
       start_period: 40s
     networks:
       - services-networks
@@ -34,9 +34,8 @@ services:
     restart: always
     container_name: 'wallet_app_container'
     build: ./wallet
-    command: yarn start
-    entrypoint: [ "sh", "-c", "npx prisma migrate dev --name initial-migrations && npx prisma db seed && yarn start;" ]
-    tty: true
+    command: [ "sh", "-c", "npx prisma migrate dev --name initial-migrations --create-only && npx prisma db seed && yarn start;" ]
+    tty: true    
     environment:
       - DATABASE_URL=mysql://root:123456@mysql:3306/wallet_nestjs?schema=public
       - URL_MICROSERVICE_SHOPPING_PORT=http://shopping-service:4001/
@@ -45,7 +44,7 @@ services:
     ports:
       - 4000:4000
     volumes:
-      - ./wallet:/usr/app
+      - ./wallet:/usr/app'
     links:
       - mysql:mysql
     networks:
@@ -55,6 +54,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      wallet-service: 
+        condition: service_started
     restart: always
     container_name: 'shopping_app_container'
     build: ./shopping
