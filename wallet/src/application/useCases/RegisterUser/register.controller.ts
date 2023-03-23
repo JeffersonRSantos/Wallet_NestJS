@@ -12,7 +12,7 @@ export class RegisterController {
   ) { }
 
   @Post('_register')
-  async createUser(@Body() body: RegisterUserDTO, @Res() res: Response): Promise<Object> {
+  async createUser(@Body() body: RegisterUserDTO, @Res() res: Response): Promise<Response> {
     try {
 
       const validateSchema = await registerUserSchema(body)
@@ -20,12 +20,15 @@ export class RegisterController {
       if (!validateSchema.success) {
         return res.status(403).json({ error: validateSchema.error.issues });
       }
+      
+      await this.registerUserUseCase.execute(body);
 
-      const useCase: any = await this.registerUserUseCase.execute(body);
-
-      return res.status(useCase?.status || 201).json(useCase)
+      return res.status(201).json()
     } catch (error) {
-      throw new Error(MessageCustomErrors.ERROR_CONTROLLER + " (/_register) " + error);
+      return res.status(500).json({
+        module: MessageCustomErrors.ERROR_CONTROLLER + " (/_register) ",
+        errorMessage: error.message
+      })
     }
   }
 }

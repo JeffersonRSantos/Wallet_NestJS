@@ -9,6 +9,9 @@ import { statusTransactionConstantEnum, typeTransactionConstantEnum } from "src/
 import { formatCurrencyPt } from "src/utils/formatCurrency";
 import { IShopping } from "../interfaces/IShopping";
 import { MessageCustom, MessageCustomError, MessageSuccess } from "src/utils/lang/common";
+import { BuyProductDTO } from "src/http/dtos/BuyProductDTO";
+import { AuthLoginEntities } from "src/application/entities/AuthLoginEntities";
+import { ResponseDTO } from "./dtos/ResponseDTO";
 
 @Injectable()
 export class ShoppingProvider implements IShopping {
@@ -34,122 +37,123 @@ export class ShoppingProvider implements IShopping {
         }
     }
 
-    async buyProduct(props: any): Promise<Object> {
-
-        const { user, body } = props
+    async buyProduct(body: BuyProductDTO, user: AuthLoginEntities): Promise<ResponseDTO> {
 
         try {
-            const productInStock: ProductEntities = await this.connectionProvider.products.findFirst({
-                where: { code: body.code_product }
-            })
 
-            if(!productInStock) return
+            return await this.connectionProvider.$transaction(async (tx) => {
 
-            let price: any = productInStock.price
+                const productInStock: ProductEntities = await tx.products.findFirst({
+                    where: { code: body.code_product }
+                })
 
-            const totalPriceAmount: any = parseFloat(price) * (body?.amount || 1)
+                if (!productInStock) throw new Error(MessageCustomError.NOT_FOUND_PRODUCT);
 
-            if (!(productInStock.stock >= body.amount)) return { message: MessageCustom.WITHOUT_STOCK }
+                let price: any = productInStock.price
 
-            const getWallet = await this.connectionProvider.wallet.findUnique({
-                where: { userId: user.id },
-                select: { balance: true }
-            })
+                const totalPriceAmount: any = parseFloat(price) * (body?.amount || 1)
 
-            let balance: any = getWallet.balance
+                if (!(productInStock.stock >= body.amount)) throw new Error(MessageCustom.WITHOUT_STOCK);
 
-            if (!(parseFloat(balance) >= totalPriceAmount)) return { message: MessageCustom.INSUFFICIENT_BALANCE }
+                const getWallet = await tx.wallet.findUnique({
+                    where: { userId: user.id },
+                    select: { balance: true }
+                })
 
-            let updateBalance: any = parseFloat(balance) - parseFloat(totalPriceAmount)
+                let balance: any = getWallet.balance
 
-            const updateWallet = await this.connectionProvider.wallet.update({
-                where: { userId: user.id },
-                data: {
-                    balance: updateBalance
+                if (!(parseFloat(balance) >= totalPriceAmount)) throw new Error(MessageCustom.INSUFFICIENT_BALANCE);
+
+                let updateBalance: any = parseFloat(balance) - parseFloat(totalPriceAmount)
+
+                const updateWallet = await tx.wallet.update({
+                    where: { userId: user.id },
+                    data: { balance: updateBalance }
+                })
+
+                const updateStock = (productInStock.stock - body.amount)
+                productInStock.stock = updateStock
+
+                await tx.products.update({
+                    where: { id: productInStock.id },
+                    data: { stock: updateStock }
+                })
+
+                const uuidTransaction: any = randomUUID()
+
+                await tx.transaction.create({
+                    data: {
+                        transactionId: uuidTransaction,
+                        value: parseFloat(totalPriceAmount),
+                        userId: user.id,
+                        typeTransaction: typeTransactionConstantEnum.BUY,
+                        productId: productInStock.id,
+                        statusTransaction: (updateWallet ? statusTransactionConstantEnum.SUCCESS : statusTransactionConstantEnum.FAILED)
+                    }
+                })
+
+                return {
+                    response: {
+                        message: MessageSuccess.SUCCESSFULLY_PURCHASE,
+                        code: productInStock.code,
+                        nameProduct: productInStock.name,
+                        stock: updateStock,
+                        price: formatCurrencyPt(parseFloat(productInStock.price))
+                    }
                 }
+
             })
-
-            const updateStock = (productInStock.stock - body.amount)
-            productInStock.stock = updateStock
-
-            await this.connectionProvider.products.update({
-                where: { id: productInStock.id },
-                data: { stock: updateStock }
-            })
-
-            const uuidTransaction: any = randomUUID()
-
-            await this.connectionProvider.transaction.create({
-                data: {
-                    transactionId: uuidTransaction,
-                    value: parseFloat(totalPriceAmount),
-                    userId: user.id,
-                    typeTransaction: typeTransactionConstantEnum.BUY,
-                    productId: productInStock.id,
-                    statusTransaction: (updateWallet ? statusTransactionConstantEnum.SUCCESS : statusTransactionConstantEnum.FAILED)
-                }
-            })
-
-            return {
-                message: MessageSuccess.SUCCESSFULLY_PURCHASE,
-                code: "clfcmvx4c0002gt3wpyrr5fvx",
-                nameProduct: "Recarga 50",
-                stock: 28,
-                price: formatCurrencyPt(parseFloat(productInStock.price))
-            }
 
         } catch (error) {
             throw new Error(error);
         }
     }
 
-    async cancellation(props: any): Promise<Object> {
+    async cancellation(code_transaction: string, user: AuthLoginEntities): Promise<TransationEntities> {
 
-        const { id } = props.user
+        const { id } = user
 
         try {
-            const existsTransaction: TransationEntities = await this.connectionProvider.transaction.findFirst({
-                where: { transactionId: props.code_transaction },
-                include: {
-                    product: {
-                        select: {
-                            name: true
-                        }
+
+            return await this.connectionProvider.$transaction(async (tx) => {
+
+                const existsTransaction: TransationEntities = await tx.transaction.findFirst({
+                    where: { transactionId: code_transaction },
+                    include: { product: { select: { name: true } } },
+                    orderBy: { id: 'desc' },
+                })
+
+                if (!existsTransaction || existsTransaction.userId != id) throw new Error(MessageCustomError.NOT_FOUND_TRANSACTION);
+
+                const validateHours = moment(existsTransaction.createdAt).add(process.env.TRANSACTION_EXPIRES_IN_MINUTES, 'm').toDate();
+
+                if (statusTransactionConstantEnum.CANCELED == existsTransaction.statusTransaction) throw new Error(MessageCustom.TRANSACTION_ALREADY_CANCELED);
+
+                if (moment(validateHours) < moment()) throw new Error(MessageCustom.TRANSACTION_EXPIRED_CANCELLATION);
+
+                const getWallet = await tx.wallet.findUnique({ where: { userId: id } })
+
+                const balance: any = getWallet.balance
+
+                const updateBalance = parseFloat(balance) + parseFloat(existsTransaction.value)
+
+                const updateWallet = await tx.wallet.update({
+                    where: { userId: id }, data: { balance: updateBalance }
+                })
+
+                await tx.transaction.create({
+                    data: {
+                        transactionId: existsTransaction.transactionId,
+                        value: existsTransaction.value,
+                        userId: existsTransaction.userId,
+                        typeTransaction: existsTransaction.typeTransaction,
+                        productId: (existsTransaction.productId ?? null),
+                        statusTransaction: (updateWallet ? statusTransactionConstantEnum.CANCELED : statusTransactionConstantEnum.FAILED)
                     }
-                },
-                orderBy: {  id: 'desc' },
+                })
+
+                return existsTransaction
             })
-
-            if (!existsTransaction || existsTransaction.userId != id) return { status: 200, message: MessageCustomError.NOT_FOUND_TRANSACTION };
-
-            const validateHours = moment(existsTransaction.createdAt).add(process.env.TRANSACTION_EXPIRES_IN_MINUTES, 'm').toDate();            
-            
-            if (statusTransactionConstantEnum.CANCELED == existsTransaction.statusTransaction) return { status: 200, message: MessageCustom.TRANSACTION_ALREADY_CANCELED }
-            
-            if (moment(validateHours) < moment()) return { status: 200, message: MessageCustom.TRANSACTION_EXPIRED_CANCELLATION }
-
-            const getWallet = await this.connectionProvider.wallet.findUnique({ where: { userId: id } })
-
-            const balance: any = getWallet.balance
-
-            const updateBalance = parseFloat(balance) + parseFloat(existsTransaction.value)
-
-            const updateWallet = await this.connectionProvider.wallet.update({
-                where: { userId: id }, data: { balance: updateBalance }
-            })
-
-            await this.connectionProvider.transaction.create({
-                data: {
-                    transactionId: existsTransaction.transactionId,
-                    value: existsTransaction.value,
-                    userId: existsTransaction.userId,
-                    typeTransaction: existsTransaction.typeTransaction,
-                    productId: (existsTransaction.productId ?? null),
-                    statusTransaction: (updateWallet ? statusTransactionConstantEnum.CANCELED : statusTransactionConstantEnum.FAILED)
-                }
-            })
-
-            return existsTransaction
         } catch (error) {
             throw new Error(error);
         }

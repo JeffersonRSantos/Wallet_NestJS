@@ -3,6 +3,7 @@ import { IRegisterUser } from "../interfaces/IRegisterUser";
 import * as bcrypt from 'bcrypt';
 import { Prisma } from "@prisma/client";
 import { Injectable } from "@nestjs/common";
+import { RegisterUserDTO } from "src/http/dtos/RegisterUserDTO";
 
 @Injectable()
 export class RegisterUserProvider implements IRegisterUser {
@@ -10,24 +11,25 @@ export class RegisterUserProvider implements IRegisterUser {
         private connectionProvider: PrismaService
     ) { }
 
-    async create(props: any): Promise<any> {
-        try {
-            props.data.password = bcrypt.hashSync(props.data.password, 10);
-            const user = await this.connectionProvider.user.create(props)
-            await this.connectionProvider.wallet.create({
-                data: {
-                    userId: user.id,
-                    balance: 0.00
+    async create(props: RegisterUserDTO): Promise<any> {
+        props.password = bcrypt.hashSync(props.password, 10);
+        return await this.connectionProvider.$transaction(async (tx) => {
+            try {
+                const user = await tx.user.create({ data: props })
+                await tx.wallet.create({
+                    data: { userId: user.id, balance: 0.00 }
+                })
+                return user
+            } catch (e) {
+                if (e instanceof Prisma.PrismaClientKnownRequestError) {
+                    if (e.code === 'P2002') {                      
+                        throw new Error(`Field: (${e.meta.target}) - already exists`);
+                    }
                 }
-            })
-        } catch (e) {
-            if (e instanceof Prisma.PrismaClientKnownRequestError) {
-                if (e.code === 'P2002') {
-                    return {status: 409, message: `Field: (${e.meta.target}) - already exists`}
-                }
+                throw new Error(e);
+                
             }
-            return e
-            
-        }
+        })
+
     }
 }

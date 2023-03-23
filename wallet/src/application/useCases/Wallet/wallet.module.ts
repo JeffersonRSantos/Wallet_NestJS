@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { IWallet } from 'src/application/repositories/interfaces/IWallet';
 import { WalletProvider } from '../../../../src/application/repositories/implementations/WalletProvider';
 import { PrismaService } from '../../../../src/services/database/PrismaService';
 import { JwtStrategy } from '../AuthLogin/strategy/jwt.strategy';
@@ -14,13 +15,13 @@ import { WalletController } from './wallet.controller';
     WalletController
   ],
   providers: [
+    { provide: IWallet, useClass: WalletProvider },
     GetBalanceUseCase,
     GetExtractUseCase,
     GetMoneyUseCase,
     SetMoneyUseCase,
     JwtStrategy,
-    PrismaService,
-    WalletProvider
+    PrismaService
   ],
 })
 

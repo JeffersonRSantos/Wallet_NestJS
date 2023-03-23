@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { WalletProvider } from "../../../../src/application/repositories/implementations/WalletProvider";
+import { AuthLoginEntities } from "src/application/entities/AuthLoginEntities";
+import { IWallet } from "src/application/repositories/interfaces/IWallet";
 
 @Injectable()
 export class GetExtractUseCase{
     constructor(
-        private walletProvider: WalletProvider
+        private walletProvider: IWallet
     ){}
 
-    async execute(data: Object){
-        return await this.walletProvider.getExtract(data)
+    async execute(user: AuthLoginEntities){
+        return await this.walletProvider.getExtract(user)
     }
 }

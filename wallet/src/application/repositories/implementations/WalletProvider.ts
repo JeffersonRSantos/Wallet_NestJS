@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common/decorators";
 import { randomUUID } from "crypto";
+import { AuthLoginEntities } from "src/application/entities/AuthLoginEntities";
 import { TransationEntities } from "../../../../src/application/entities/TransactionEntities";
 import { WalletEntities } from "../../../../src/application/entities/WalletEntities";
 import { PrismaService } from "../../../../src/services/database/PrismaService";
@@ -7,6 +8,7 @@ import { statusTransactionConstantEnum, statusTransactionEnum, typeTransactionCo
 import { formatCurrencyPt } from "../../../../src/utils/formatCurrency";
 import { MessageCustom, MessageCustomErrors, MessageCustomSuccess } from "../../../../src/utils/lang/common";
 import { IWallet } from "../interfaces/IWallet";
+import { ResponseDTO } from "./dto/ResponseDTO";
 
 @Injectable()
 export class WalletProvider implements IWallet {
@@ -16,14 +18,16 @@ export class WalletProvider implements IWallet {
 
     public dataCreateTransaction: any
 
-    async setMoney(props: any): Promise<Object> {
+    async setMoney(value: string, user: AuthLoginEntities): Promise<ResponseDTO> {
+
+        const formatCurrency = parseFloat(value.replace(',', '.'));
 
         const uuidTransaction = randomUUID()
 
         let transaction: TransationEntities = {
             transactionId: uuidTransaction,
-            value: parseFloat(props.value),
-            userId: props.user.id,
+            value: formatCurrency,
+            userId: user.id,
             typeTransaction: typeTransactionConstantEnum.DEPOSIT
         }
 
@@ -32,92 +36,96 @@ export class WalletProvider implements IWallet {
             this.dataCreateTransaction = { data: transaction }
             await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
-            const getWallet: WalletEntities = await this.connectionProvider.wallet.findUnique({
-                where: {
-                    userId: props.user.id
-                }
+            return await this.connectionProvider.$transaction(async (tx) => {
+
+                const getWallet: WalletEntities = await tx.wallet.findUnique({
+                    where: { userId: user.id }
+                })
+
+                if (!getWallet) throw new Error(MessageCustomErrors.USER_NO_EXISTS);
+
+                const updateValue = (parseFloat(getWallet.balance) + formatCurrency)
+                const updateBalance = await tx.wallet.update({
+                    where: { userId: user.id },
+                    data: { balance: updateValue }
+                })
+
+                if (!updateBalance) throw new Error(MessageCustomErrors.ERROR_UPDATE_BALANCE);
+
+                transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
+
+                this.dataCreateTransaction = { data: transaction }
+                await tx.transaction.create(this.dataCreateTransaction)
+
+                return { response: { message: MessageCustomSuccess.DEPOSIT_SUCCESSFULLY } }
             })
 
-            const updateValue = (parseFloat(getWallet.balance) + parseFloat(props.value))
-            const updateBalance = await this.connectionProvider.wallet.update({
-                where: { userId: props.user.id },
-                data: {
-                    balance: updateValue
-                }
-            })
-
-            if (!updateBalance) return { status: 409, messsage: MessageCustomErrors.ERROR_UPDATE_BALANCE }
-
-            transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
-
-            this.dataCreateTransaction = { data: transaction }
-            await this.connectionProvider.transaction.create(this.dataCreateTransaction)
-
-            return { message: MessageCustomSuccess.DEPOSIT_SUCCESSFULLY }
         } catch (error) {
 
             transaction.statusTransaction = statusTransactionConstantEnum.FAILED
             this.dataCreateTransaction = { data: transaction }
             await this.connectionProvider.transaction.create(this.dataCreateTransaction)
 
-            return { status: 500, error }
+            throw new Error(error);
+
         }
     }
 
-    async getMoney(props: any): Promise<Object> {
+    async getMoney(value: string, user: AuthLoginEntities): Promise<ResponseDTO> {
+
+        const formatCurrency = parseFloat(value.replace(',', '.'));
 
         const uuidTransaction = randomUUID()
 
         let transaction: TransationEntities = {
             transactionId: uuidTransaction,
-            value: parseFloat(props.value),
-            userId: props.user.id,
+            value: formatCurrency,
+            userId: user.id,
             typeTransaction: typeTransactionConstantEnum.WITHDRAW
         }
 
         try {
 
-            const getWallet: WalletEntities = await this.connectionProvider.wallet.findUnique({
-                where: {
-                    userId: props.user.id
-                }
+            return await this.connectionProvider.$transaction(async (tx) => {
+
+                const getWallet: WalletEntities = await tx.wallet.findUnique({
+                    where: { userId: user.id }
+                })
+    
+                const value = formatCurrency
+                const balance = parseFloat(getWallet.balance)
+    
+                if (value > balance) throw new Error(MessageCustom.AMOUNT_GREATER_ON_BALANCE);
+    
+                const updateValue = (parseFloat(getWallet.balance) - formatCurrency)
+                const updateBalance = await tx.wallet.update({
+                    where: { userId: user.id },
+                    data: { balance: updateValue }
+                })
+    
+                if (!updateBalance) throw new Error(MessageCustomErrors.ERROR_UPDATE_BALANCE);
+    
+                transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
+                this.dataCreateTransaction = { data: transaction }
+                await tx.transaction.create(this.dataCreateTransaction)
+    
+                return { response: { message: MessageCustomSuccess.WITHDRAWAL_SUCCESSFULLY } }
             })
-
-            const value = parseFloat(props.value)
-            const balance = parseFloat(getWallet.balance)
-
-            if (value > balance) return { status: 401, message: MessageCustom.AMOUNT_GREATER_ON_BALANCE }
-
-            const updateValue = (parseFloat(getWallet.balance) - parseFloat(props.value))
-            const updateBalance = await this.connectionProvider.wallet.update({
-                where: { userId: props.user.id },
-                data: {
-                    balance: updateValue
-                }
-            })
-
-            if (!updateBalance) return { status: 409, messsage: MessageCustomErrors.ERROR_UPDATE_BALANCE }
-
-            transaction.statusTransaction = statusTransactionConstantEnum.SUCCESS
-            this.dataCreateTransaction = { data: transaction }
-            await this.connectionProvider.transaction.create(this.dataCreateTransaction)
-
-            return { status: 200, message: MessageCustomSuccess.WITHDRAWAL_SUCCESSFULLY }
 
         } catch (error) {
-            return { status: 500, error }
+            throw new Error(error);
         }
     }
 
-    async getExtract(props: any): Promise<Object> {
+    async getExtract(user: AuthLoginEntities): Promise<TransationEntities[]> {
 
         try {
-            const findTransactions = await this.connectionProvider.transaction.findMany({
-                where: { userId: props.id },
+            const findTransactions: TransationEntities[] = await this.connectionProvider.transaction.findMany({
+                where: { userId: user.id },
                 include: { product: true },
             })
 
-            if (!findTransactions || findTransactions.length === 0) return { message: MessageCustom.WITHOUT_REGISTERS_EXTRACT }
+            if (!findTransactions || findTransactions.length === 0) throw new Error(MessageCustom.WITHOUT_REGISTERS_EXTRACT);            
 
             for (const [key, item] of Object.entries(findTransactions)) {
                 findTransactions[key].value = formatCurrencyPt(item.value)
@@ -125,23 +133,20 @@ export class WalletProvider implements IWallet {
                 findTransactions[key].statusTransaction = statusTransactionEnum[(item.statusTransaction - 1)]['value']
             }
 
-            return { response: findTransactions }
+            return findTransactions
 
         } catch (error) {
-            return { status: 500, error }
+            throw new Error(error);            
         }
     }
 
-    async getBalance(props: any): Promise<WalletEntities> {
+    async getBalance(user: AuthLoginEntities): Promise<WalletEntities> {
         try {
             return await this.connectionProvider.wallet.findUnique({
-                where: {
-                    userId: props.id
-                }
+                where: { userId: user.id }
             })
         } catch (error) {
-            throw new Error(error);
-
+            throw new Error(error.message);
         }
     }
 

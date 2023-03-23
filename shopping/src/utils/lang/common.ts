@@ -1,15 +1,16 @@
 export enum MessageCustom {
-    WITHOUT_STOCK= "Ops... Product out of stock! :/",
-    INSUFFICIENT_BALANCE= "Ops... Insufficient balance! :/",
-    TRANSACTION_ALREADY_CANCELED= "transaction already canceled.",
-    TRANSACTION_EXPIRED_CANCELLATION= "Transaction expired for cancellation."
+    WITHOUT_STOCK = "Ops... Product out of stock! :/",
+    INSUFFICIENT_BALANCE = "Ops... Insufficient balance! :/",
+    TRANSACTION_ALREADY_CANCELED = "transaction already canceled.",
+    TRANSACTION_EXPIRED_CANCELLATION = "Transaction expired for cancellation."
 }
 
 export enum MessageCustomError {
-    ERROR_CONTROLLER= "Error to controller:",
-    NOT_FOUND_TRANSACTION= "Code transaction not found.",
+    ERROR_CONTROLLER = "Error to controller:",
+    NOT_FOUND_TRANSACTION = "Code transaction not found.",
+    NOT_FOUND_PRODUCT = "Product no exists."
 }
 
 export enum MessageSuccess {
-    SUCCESSFULLY_PURCHASE= "Successfully purchase.",
+    SUCCESSFULLY_PURCHASE = "Successfully purchase.",
 }

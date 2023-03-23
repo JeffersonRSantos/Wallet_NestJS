@@ -2,7 +2,8 @@ export enum MessageCustomErrors {
     ERROR_CONTROLLER= "Error to controller:",
     LOGIN_INVALID= "Login invalid.",
     ERROR_UPDATE_BALANCE= "Erro to update balance on wallet.",
-    PRODUCT_NO_EXISTS= "Product no exists."
+    PRODUCT_NO_EXISTS= "Product no exists.",
+    USER_NO_EXISTS="User no exists."
 }
 
 export enum MessageCustomSuccess {

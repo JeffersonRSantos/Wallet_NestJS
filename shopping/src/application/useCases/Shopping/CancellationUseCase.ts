@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common/decorators";
-import { ShoppingProvider } from "src/application/repositories/implementations/ShoppingProvider";
+import { AuthLoginEntities } from "src/application/entities/AuthLoginEntities";
+import { IShopping } from "src/application/repositories/interfaces/IShopping";
 
 @Injectable()
 export class CancellationUseCase{
     constructor(
-        private cancellationProvider: ShoppingProvider
+        private cancellationProvider: IShopping
     ){}
 
-    async execute(props: Object){
-        return await this.cancellationProvider.cancellation(props)
+    async execute(code_transaction: string, user: AuthLoginEntities){
+        return await this.cancellationProvider.cancellation(code_transaction, user)
     }
 }

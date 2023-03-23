@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { AuthLoginProvider } from "../../../../src/application/repositories/implementations/AuthLoginProvider";
+import { IAuthLogin } from "src/application/repositories/interfaces/IAuthLogin";
+import { AuthLoginDTO } from "src/http/dtos/AuthLoginDTO";
 
 @Injectable()
 export class AuthLoginUseCase{
     constructor(
-        private authLoginProvider: AuthLoginProvider
+        private authLoginProvider: IAuthLogin
     ){}
 
-    async execute(props: Object){
+    async execute(props: AuthLoginDTO){
         return await this.authLoginProvider.login(props)
     }
 }
