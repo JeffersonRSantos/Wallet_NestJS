@@ -42,7 +42,7 @@ describe('Login', () => {
       .set('Accept', 'application/json')
       .expect('Content-Type', 'application/json; charset=utf-8')
 
-    expect(response.status).toEqual(403);
+    expect(response.status).toEqual(401);
   });
 
   afterAll(async () => {

@@ -2,7 +2,7 @@ import { Controller, Post, Req, Res, Get, UseGuards, Body } from '@nestjs/common
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { TransationEntities } from 'src/application/entities/TransactionEntities';
-import { ResponseDTO } from 'src/application/repositories/implementations/dto/ResponseDTO';
+import { ResponseDTO } from '../../../../src/application/repositories/implementations/dto/ResponseDTO';
 import { AuthLoginEntities } from '../../../../src/application/entities/AuthLoginEntities';
 import { WalletEntities } from '../../../../src/application/entities/WalletEntities';
 import { JwtAuthGuard } from '../../../../src/core/guards/jwt-auth.guard';
@@ -75,12 +75,13 @@ export class WalletController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get('_extract')
-  async extract(@Req() req: Request): Promise<TransationEntities[]> {
+  async extract(@Req() req: Request): Promise<ResponseDTO> {
 
     const userAuth: AuthLoginEntities = req.user
 
     try {
-      return await this.getExtractUseCase.execute(userAuth)
+      const result = await this.getExtractUseCase.execute(userAuth)
+      return {response: result}
     } catch (error) {
       throw new Error(error.message);
     }

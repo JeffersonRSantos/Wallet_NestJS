@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
 
-describe('Login', () => {
+describe('Shopping', () => {
   let app: INestApplication;
   let access_token: string
   let products: any
@@ -42,7 +42,7 @@ describe('Login', () => {
       .set({ Authorization: 'Bearer ' + token })
 
     console.log(response.text)
-    products = JSON.parse(response.text)
+    products = JSON.parse(response.text).response
     expect(response.status).toEqual(200)
   });
 

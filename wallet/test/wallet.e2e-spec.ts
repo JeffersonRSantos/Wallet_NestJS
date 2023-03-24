@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
 
-describe('Login', () => {
+describe('Wallet', () => {
   let app: INestApplication;
   let access_token: string
 

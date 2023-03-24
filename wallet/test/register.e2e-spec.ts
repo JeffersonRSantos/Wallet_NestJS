@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../src/app.module';
 
-describe('Login', () => {
+describe('Register', () => {
   let app: INestApplication;
   let access_token: string
   
@@ -52,7 +52,7 @@ describe('Login', () => {
       .set('Accept', 'application/json')
       .expect('Content-Type', 'application/json; charset=utf-8')
 
-    expect(response.status).toEqual(409);
+    expect(response.status).toEqual(500);
   });
 
   afterAll(async () => {

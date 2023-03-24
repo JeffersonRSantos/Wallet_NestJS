@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { AuthLoginEntities } from "src/application/entities/AuthLoginEntities";
-import { IWallet } from "src/application/repositories/interfaces/IWallet";
+import { AuthLoginEntities } from "../../../../src/application/entities/AuthLoginEntities";
+import { IWallet } from "../../../../src/application/repositories/interfaces/IWallet";
 
 @Injectable()
 export class GetExtractUseCase{

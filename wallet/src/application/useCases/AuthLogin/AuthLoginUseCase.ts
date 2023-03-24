@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { IAuthLogin } from "src/application/repositories/interfaces/IAuthLogin";
-import { AuthLoginDTO } from "src/http/dtos/AuthLoginDTO";
+import { IAuthLogin } from "../../../../src/application/repositories/interfaces/IAuthLogin";
+import { AuthLoginDTO } from "../../../../src/http/dtos/AuthLoginDTO";
 
 @Injectable()
 export class AuthLoginUseCase{
